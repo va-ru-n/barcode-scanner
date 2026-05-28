@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -18,24 +19,24 @@
 }
 
 body{
-    background:#f2f2f2;
+    background:#ececec;
     display:flex;
     justify-content:center;
     padding:20px;
 }
 
 .container{
-    width:420px;
+    width:430px;
     background:white;
-    padding:25px;
     border-radius:25px;
+    padding:25px;
     box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
 
 h1{
     text-align:center;
+    font-size:38px;
     margin-bottom:10px;
-    font-size:40px;
 }
 
 .subtitle{
@@ -46,9 +47,43 @@ h1{
 
 #reader{
     width:100%;
-    border-radius:20px;
     overflow:hidden;
+    border-radius:20px;
     margin-bottom:25px;
+}
+
+.add-product{
+    background:#f7f7f7;
+    padding:15px;
+    border-radius:20px;
+    margin-bottom:25px;
+}
+
+.add-product h2{
+    margin-bottom:15px;
+    text-align:center;
+}
+
+input{
+    width:100%;
+    height:45px;
+    margin-bottom:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+    padding-left:12px;
+    font-size:16px;
+}
+
+.add-btn{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:15px;
+    background:#6a00ff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    font-weight:bold;
 }
 
 .bill{
@@ -86,7 +121,7 @@ h1{
     margin-top:20px;
 }
 
-button{
+.action-btn{
     flex:1;
     height:55px;
     border:none;
@@ -114,6 +149,7 @@ button{
 
     #reader,
     .buttons,
+    .add-product,
     .subtitle{
         display:none;
     }
@@ -127,6 +163,7 @@ button{
 }
 
 </style>
+
 </head>
 
 <body>
@@ -141,6 +178,26 @@ button{
 
     <div id="reader"></div>
 
+    <!-- ADD PRODUCT -->
+
+    <div class="add-product">
+
+        <h2>Add New Product</h2>
+
+        <input type="text" id="barcode" placeholder="Enter Barcode">
+
+        <input type="text" id="productName" placeholder="Enter Product Name">
+
+        <input type="number" id="productPrice" placeholder="Enter Product Price">
+
+        <button class="add-btn" onclick="addProduct()">
+            Add Product
+        </button>
+
+    </div>
+
+    <!-- BILL -->
+
     <div class="bill">
 
         <h2>Customer Bill</h2>
@@ -148,19 +205,24 @@ button{
         <div id="billItems"></div>
 
         <div class="total">
+
             <span>Total</span>
+
             <span id="total">₹0</span>
+
         </div>
 
     </div>
 
+    <!-- BUTTONS -->
+
     <div class="buttons">
 
-        <button class="clear-btn" onclick="clearBill()">
+        <button class="action-btn clear-btn" onclick="clearBill()">
             Clear
         </button>
 
-        <button class="print-btn" onclick="window.print()">
+        <button class="action-btn print-btn" onclick="window.print()">
             Print Bill
         </button>
 
@@ -172,29 +234,33 @@ button{
 
 let total = 0;
 
-const products = {
+/* PRODUCT DATABASE */
 
-    "12345": {
+let products = {
+
+    "12345":{
         name:"Burger",
         price:120
     },
 
-    "23456": {
+    "23456":{
         name:"Pizza",
         price:250
     },
 
-    "34567": {
+    "34567":{
         name:"Coffee",
         price:60
     },
 
-    "45678": {
+    "45678":{
         name:"Fries",
         price:80
     }
 
 };
+
+/* ADD ITEM TO BILL */
 
 function addToBill(name, price){
 
@@ -216,6 +282,8 @@ function addToBill(name, price){
     document.getElementById("total").innerText = "₹" + total;
 }
 
+/* CLEAR BILL */
+
 function clearBill(){
 
     document.getElementById("billItems").innerHTML = "";
@@ -224,6 +292,41 @@ function clearBill(){
 
     document.getElementById("total").innerText = "₹0";
 }
+
+/* ADD NEW PRODUCT */
+
+function addProduct(){
+
+    let barcode = document.getElementById("barcode").value;
+
+    let name = document.getElementById("productName").value;
+
+    let price = document.getElementById("productPrice").value;
+
+    if(barcode === "" || name === "" || price === ""){
+
+        alert("Please fill all fields");
+
+        return;
+    }
+
+    products[barcode] = {
+
+        name:name,
+        price:Number(price)
+
+    };
+
+    alert("Product Added Successfully");
+
+    document.getElementById("barcode").value = "";
+
+    document.getElementById("productName").value = "";
+
+    document.getElementById("productPrice").value = "";
+}
+
+/* SCAN SUCCESS */
 
 function onScanSuccess(decodedText){
 
@@ -236,21 +339,47 @@ function onScanSuccess(decodedText){
     }
     else{
 
-        alert("Product not found");
+        alert("Product Not Found");
 
     }
 
 }
 
-let scanner = new Html5QrcodeScanner(
-    "reader",
-    {
-        fps:10,
-        qrbox:250
-    }
-);
+/* START CAMERA */
+/* BACK CAMERA ENABLED */
 
-scanner.render(onScanSuccess);
+const html5QrCode = new Html5Qrcode("reader");
+
+Html5Qrcode.getCameras().then(devices => {
+
+    if(devices && devices.length){
+
+        let backCamera = devices.find(device =>
+            device.label.toLowerCase().includes('back')
+        );
+
+        let cameraId = backCamera ? backCamera.id : devices[0].id;
+
+        html5QrCode.start(
+
+            cameraId,
+
+            {
+                fps:10,
+                qrbox:250
+            },
+
+            onScanSuccess
+
+        );
+
+    }
+
+}).catch(err => {
+
+    console.log(err);
+
+});
 
 </script>
 
