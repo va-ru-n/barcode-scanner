@@ -1,3 +1,4 @@
+```html id="j3m1f0"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +6,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Advanced Barcode Billing System</title>
+<title>Smart Restaurant Billing System</title>
 
+<!-- QR SCANNER -->
 <script src="https://unpkg.com/html5-qrcode"></script>
+
+<!-- BARCODE GENERATOR -->
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 
 <style>
@@ -30,13 +34,44 @@ body{
     width:450px;
     background:white;
     border-radius:25px;
-    padding:25px;
+    padding:20px;
     box-shadow:0 5px 20px rgba(0,0,0,0.2);
 }
 
+/* NAVIGATION */
+
+.nav{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.nav button{
+    flex:1;
+    height:45px;
+    border:none;
+    border-radius:12px;
+    background:#6a00ff;
+    color:white;
+    font-size:15px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* PAGES */
+
+.page{
+    display:none;
+}
+
+.active{
+    display:block;
+}
+
+/* TITLES */
+
 h1{
     text-align:center;
-    font-size:38px;
     margin-bottom:10px;
 }
 
@@ -46,59 +81,13 @@ h1{
     margin-bottom:20px;
 }
 
+/* SCANNER */
+
 #reader{
     width:100%;
     overflow:hidden;
     border-radius:20px;
-    margin-bottom:25px;
-}
-
-/* ADD PRODUCT */
-
-.add-product{
-    background:#f7f7f7;
-    padding:15px;
-    border-radius:20px;
-    margin-bottom:25px;
-}
-
-.add-product h2{
-    text-align:center;
-    margin-bottom:15px;
-}
-
-input{
-    width:100%;
-    height:45px;
-    margin-bottom:12px;
-    border-radius:12px;
-    border:1px solid #ccc;
-    padding-left:12px;
-    font-size:16px;
-}
-
-.add-btn{
-    width:100%;
-    height:50px;
-    border:none;
-    border-radius:15px;
-    background:#6a00ff;
-    color:white;
-    font-size:18px;
-    cursor:pointer;
-    font-weight:bold;
-}
-
-/* BARCODE */
-
-.barcode-box{
-    text-align:center;
-    margin-top:15px;
-}
-
-svg{
-    width:100%;
-    max-width:300px;
+    margin-bottom:20px;
 }
 
 /* BILL */
@@ -120,13 +109,14 @@ svg{
     justify-content:space-between;
     align-items:center;
     margin-bottom:12px;
-    font-size:16px;
+    padding-bottom:10px;
+    border-bottom:1px solid #ddd;
 }
 
 .qty-box{
     display:flex;
     align-items:center;
-    gap:8px;
+    gap:5px;
 }
 
 .qty-btn{
@@ -159,31 +149,82 @@ svg{
     font-weight:bold;
 }
 
+/* BUTTONS */
+
 .buttons{
     display:flex;
-    gap:15px;
+    gap:10px;
     margin-top:20px;
 }
 
 .action-btn{
     flex:1;
-    height:55px;
+    height:50px;
     border:none;
-    border-radius:18px;
-    font-size:18px;
+    border-radius:15px;
+    color:white;
+    font-size:17px;
     cursor:pointer;
     font-weight:bold;
 }
 
 .print-btn{
     background:#6a00ff;
-    color:white;
 }
 
 .clear-btn{
-    background:#ff4d4d;
-    color:white;
+    background:red;
 }
+
+/* INPUTS */
+
+input{
+    width:100%;
+    height:45px;
+    margin-bottom:12px;
+    border-radius:12px;
+    border:1px solid #ccc;
+    padding-left:10px;
+    font-size:16px;
+}
+
+.add-btn{
+    width:100%;
+    height:50px;
+    border:none;
+    border-radius:15px;
+    background:#6a00ff;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* PRODUCT PAGE */
+
+.product-card{
+    background:#fafafa;
+    border-radius:20px;
+    padding:15px;
+    margin-bottom:20px;
+    text-align:center;
+    border:1px solid #ddd;
+}
+
+.product-card h3{
+    margin-bottom:10px;
+}
+
+.product-card p{
+    margin-bottom:10px;
+}
+
+svg{
+    width:100%;
+    max-width:250px;
+}
+
+/* PRINT */
 
 @media print{
 
@@ -191,12 +232,11 @@ svg{
         background:white;
     }
 
+    .nav,
     #reader,
     .buttons,
-    .add-product,
-    .subtitle,
-    .remove-btn,
-    .qty-btn{
+    .qty-btn,
+    .remove-btn{
         display:none;
     }
 
@@ -216,65 +256,100 @@ svg{
 
 <div class="container">
 
-    <h1>JPT Store</h1>
+    <!-- NAVIGATION -->
 
-    <div class="subtitle">
-        Smart Barcode Billing System
-    </div>
+    <div class="nav">
 
-    <div id="reader"></div>
-
-    <!-- ADD PRODUCT -->
-
-    <div class="add-product">
-
-        <h2>Add New Product</h2>
-
-        <input type="text" id="barcode" placeholder="Barcode">
-
-        <input type="text" id="productName" placeholder="Product Name">
-
-        <input type="number" id="productPrice" placeholder="Product Price">
-
-        <button class="add-btn" onclick="addProduct()">
-            Add Product & Generate Barcode
+        <button onclick="showPage('billingPage')">
+            Billing
         </button>
 
-        <div class="barcode-box">
-            <svg id="barcodeImage"></svg>
-        </div>
+        <button onclick="showPage('addPage')">
+            Add Product
+        </button>
+
+        <button onclick="showPage('productsPage')">
+            Products
+        </button>
 
     </div>
 
-    <!-- BILL -->
+    <!-- BILLING PAGE -->
 
-    <div class="bill">
+    <div id="billingPage" class="page active">
 
-        <h2>Customer Bill</h2>
+        <h1>JPT Store</h1>
 
-        <div id="billItems"></div>
+        <div class="subtitle">
+            Scan Products & Print Bills
+        </div>
 
-        <div class="total">
+        <div id="reader"></div>
 
-            <span>Total</span>
+        <div class="bill">
 
-            <span id="total">₹0</span>
+            <h2>Customer Bill</h2>
+
+            <div id="billItems"></div>
+
+            <div class="total">
+
+                <span>Total</span>
+
+                <span id="total">₹0</span>
+
+            </div>
 
         </div>
 
-    </div>
+        <div class="buttons">
 
-    <!-- BUTTONS -->
-
-    <div class="buttons">
-
-        <button class="action-btn clear-btn" onclick="clearBill()">
+            <button class="action-btn clear-btn"
+            onclick="clearBill()">
             Clear
+            </button>
+
+            <button class="action-btn print-btn"
+            onclick="window.print()">
+            Print
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- ADD PRODUCT PAGE -->
+
+    <div id="addPage" class="page">
+
+        <h1>Add Product</h1>
+
+        <input type="text"
+        id="barcode"
+        placeholder="Enter Barcode">
+
+        <input type="text"
+        id="productName"
+        placeholder="Enter Product Name">
+
+        <input type="number"
+        id="productPrice"
+        placeholder="Enter Product Price">
+
+        <button class="add-btn"
+        onclick="addProduct()">
+        Add Product
         </button>
 
-        <button class="action-btn print-btn" onclick="window.print()">
-            Print Bill
-        </button>
+    </div>
+
+    <!-- PRODUCTS PAGE -->
+
+    <div id="productsPage" class="page">
+
+        <h1>Products</h1>
+
+        <div id="productList"></div>
 
     </div>
 
@@ -282,11 +357,23 @@ svg{
 
 <script>
 
-/* BEEP SOUND */
+/* MOBILE FRIENDLY BEEP */
 
-const beep = new Audio(
-'https://actions.google.com/sounds/v1/cartoon/beep_short.ogg'
-);
+function playBeep(){
+
+    const beep = new Audio(
+    "https://actions.google.com/sounds/v1/cartoon/beep_short.ogg"
+    );
+
+    beep.volume = 1;
+
+    beep.play().catch(err => {
+
+        console.log(err);
+
+    });
+
+}
 
 /* PRODUCT DATABASE */
 
@@ -300,26 +387,55 @@ let products = {
     "23456":{
         name:"Pizza",
         price:250
+    },
+
+    "34567":{
+        name:"Coffee",
+        price:60
     }
 
 };
 
 let bill = {};
+
 let total = 0;
+
+/* PAGE SWITCH */
+
+function showPage(pageId){
+
+    let pages =
+    document.querySelectorAll(".page");
+
+    pages.forEach(page => {
+
+        page.classList.remove("active");
+
+    });
+
+    document.getElementById(pageId)
+    .classList.add("active");
+
+}
 
 /* ADD PRODUCT */
 
 function addProduct(){
 
-    let barcode = document.getElementById("barcode").value;
+    let barcode =
+    document.getElementById("barcode").value;
 
-    let name = document.getElementById("productName").value;
+    let name =
+    document.getElementById("productName").value;
 
-    let price = document.getElementById("productPrice").value;
+    let price =
+    document.getElementById("productPrice").value;
 
-    if(barcode === "" || name === "" || price === ""){
+    if(barcode === "" ||
+       name === "" ||
+       price === ""){
 
-        alert("Fill all fields");
+        alert("Please fill all fields");
 
         return;
     }
@@ -331,16 +447,62 @@ function addProduct(){
 
     };
 
-    /* GENERATE BARCODE */
-
-    JsBarcode("#barcodeImage", barcode, {
-
-        format:"CODE128",
-        displayValue:true
-
-    });
-
     alert("Product Added Successfully");
+
+    document.getElementById("barcode").value = "";
+
+    document.getElementById("productName").value = "";
+
+    document.getElementById("productPrice").value = "";
+
+    renderProducts();
+
+}
+
+/* RENDER PRODUCTS */
+
+function renderProducts(){
+
+    let productList =
+    document.getElementById("productList");
+
+    productList.innerHTML = "";
+
+    for(let code in products){
+
+        let product = products[code];
+
+        let card =
+        document.createElement("div");
+
+        card.classList.add("product-card");
+
+        card.innerHTML = `
+
+            <h3>${product.name}</h3>
+
+            <p>₹${product.price}</p>
+
+            <svg id="barcode-${code}"></svg>
+
+        `;
+
+        productList.appendChild(card);
+
+        JsBarcode(
+
+            `#barcode-${code}`,
+
+            code,
+
+            {
+                format:"CODE128",
+                displayValue:true
+            }
+
+        );
+
+    }
 
 }
 
@@ -348,9 +510,9 @@ function addProduct(){
 
 function addToBill(barcode){
 
-    let product = products[barcode];
+    playBeep();
 
-    beep.play();
+    let product = products[barcode];
 
     if(bill[barcode]){
 
@@ -370,13 +532,15 @@ function addToBill(barcode){
     }
 
     renderBill();
+
 }
 
 /* RENDER BILL */
 
 function renderBill(){
 
-    let billItems = document.getElementById("billItems");
+    let billItems =
+    document.getElementById("billItems");
 
     billItems.innerHTML = "";
 
@@ -386,11 +550,10 @@ function renderBill(){
 
         let item = bill[code];
 
-        let itemTotal = item.price * item.qty;
+        total += item.price * item.qty;
 
-        total += itemTotal;
-
-        let div = document.createElement("div");
+        let div =
+        document.createElement("div");
 
         div.classList.add("bill-item");
 
@@ -431,8 +594,9 @@ function renderBill(){
 
     }
 
-    document.getElementById("total").innerText =
-    "₹" + total;
+    document.getElementById("total")
+    .innerText = "₹" + total;
+
 }
 
 /* CHANGE QUANTITY */
@@ -448,6 +612,7 @@ function changeQty(code, value){
     }
 
     renderBill();
+
 }
 
 /* REMOVE ITEM */
@@ -457,6 +622,7 @@ function removeItem(code){
     delete bill[code];
 
     renderBill();
+
 }
 
 /* CLEAR BILL */
@@ -466,11 +632,13 @@ function clearBill(){
     bill = {};
 
     renderBill();
+
 }
 
 /* SCANNER FIX */
 
 let lastScannedCode = "";
+
 let scanCooldown = false;
 
 /* SCAN SUCCESS */
@@ -510,20 +678,28 @@ function onScanSuccess(decodedText){
 
 }
 
+/* START CAMERA */
 /* BACK CAMERA */
 
-const html5QrCode = new Html5Qrcode("reader");
+const html5QrCode =
+new Html5Qrcode("reader");
 
-Html5Qrcode.getCameras().then(devices => {
+Html5Qrcode.getCameras()
+.then(devices => {
 
     if(devices && devices.length){
 
-        let backCamera = devices.find(device =>
-            device.label.toLowerCase().includes('back')
+        let backCamera =
+        devices.find(device =>
+            device.label
+            .toLowerCase()
+            .includes('back')
         );
 
-        let cameraId = backCamera ?
-        backCamera.id : devices[0].id;
+        let cameraId =
+        backCamera ?
+        backCamera.id :
+        devices[0].id;
 
         html5QrCode.start(
 
@@ -546,7 +722,13 @@ Html5Qrcode.getCameras().then(devices => {
 
 });
 
+/* INITIAL PRODUCTS */
+
+renderProducts();
+
 </script>
 
 </body>
+
 </html>
+```
